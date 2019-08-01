@@ -95,12 +95,8 @@ const findPath = (myX, myY, oppX, oppY) => {
       : -1
 }
 
-const findNextStep = (myX, myY, oppX, oppY, parent) => {
-    console.error('me:', myX, myY) // DELETE
-    console.error('opp:', oppX, oppY) // DELETE
-    
+const findNextStep = (myX, myY, oppX, oppY, parent) => {    
     let [x, y] = parent[oppY][oppX]
-    console.error([x, y]) // DELETE
     let nextX
     let nextY
     
@@ -113,8 +109,6 @@ const findNextStep = (myX, myY, oppX, oppY, parent) => {
             x = parent[nextY][nextX][0]
             y = parent[nextY][nextX][1]
         }
-
-        console.error([x, y]) // DELETE
     }
     
     return getNextDirection(myX, myY, nextX, nextY)
@@ -131,7 +125,7 @@ const printMatrix = (matrix) => {
   for (let i = 0; i < HEIGHT_LIMIT; i++) {
     row = ''
     for(let j = 0; j < WIDTH_LIMIT; j++) {
-      if (matrix[i][j]) row += '*' // ` ${matrix[i][j]}`
+      if (matrix[i][j]) row += '*'
       else row += '.'
     }
     row += '\n'
@@ -149,8 +143,8 @@ const LEFT = 'LEFT'
 
 const path = []
 
-lastHorizontalMove = RIGHT
-lastVerticalMove = UP
+let lastHorizontalMove = RIGHT
+let lastVerticalMove = UP
 
 const nextStep = (...params) => {
     let result
