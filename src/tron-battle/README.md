@@ -2,8 +2,13 @@
 
 ## TODO
 
-- [ ] Consider space opened by dead players
+- [x] Consider space opened by dead players
+- [ ] Unify `globalGrid` and `globalPath` variables
+- [ ] Remove unnecessary comments
+- [ ] Adapt the usage of `findPath` to 3 players
+- [ ] Use the concept of reachable frontier to decide the next step
 - [ ] Purify functions and eliminate global variables
 - [ ] generalize `printMatrix` to stop using global variables
 - [ ] split code into multiple files and create a script for creating a bundle
+- [ ] Stop pushing `[x0, y0]` on `globalPath` and `globalGrid` every time
 - [ ] Add tests
