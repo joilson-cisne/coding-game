@@ -10,35 +10,35 @@ let nodesInNextLater
 let xQueue
 let yQueue
 
-let visited
-let parent
-let grid = []
+let globalVisited
+let globalParent
+let globalGrid = []
 
 for (let i = 0; i < HEIGHT_LIMIT; i++) {
-  grid.push(Array(WIDTH_LIMIT).fill(false))
+  globalGrid.push(Array(WIDTH_LIMIT).fill(false))
 }
 
-// North, South, West, East direction vectors
+// UP, DOWN, LEFT, RIGHT direction vectors
 const dx = [-1, 1, 0, 0]
 const dy = [0, 0, -1, 1]
 
-const exploreNeighborhood = (x, y, oppX, oppY) => {
+const exploreNeighborhood = (x, y, destX, destY) => {
   for (let i = 0; i < 4; i++) {
-    const xx = x + dx[i]
-    const yy = y + dy[i]
+    const neighborX = x + dx[i]
+    const neighborY = y + dy[i]
     
     // Skip out of bounds locations
-    if (xx < 0 || yy < 0) continue
-    if (xx >= WIDTH_LIMIT || yy >= HEIGHT_LIMIT) continue
+    if (neighborX < 0 || neighborY < 0) continue
+    if (neighborX >= WIDTH_LIMIT || neighborY >= HEIGHT_LIMIT) continue
 
     // Skip visited locations and blocked cells
-    if (visited[yy][xx]) continue
-    if (grid[yy][xx] && (xx !== oppX || yy !== oppY)) continue
+    if (globalVisited[neighborY][neighborX]) continue
+    if (globalGrid[neighborY][neighborX] && (neighborX !== destX || neighborY !== destY)) continue
 
-    xQueue.push(xx)
-    yQueue.push(yy)
-    visited[yy][xx] = true
-    parent[yy][xx] = [x, y]
+    xQueue.push(neighborX)
+    yQueue.push(neighborY)
+    globalVisited[neighborY][neighborX] = true
+    globalParent[neighborY][neighborX] = { x, y }
     nodesInNextLater++
   }
 }
@@ -50,14 +50,14 @@ const findPath = (myX, myY, oppX, oppY) => {
     nodesLeftInLayer = 1
     nodesInNextLater = 0
 
-    visited = []
+    globalVisited = []
     for (let i = 0; i < HEIGHT_LIMIT; i++) {
-      visited.push(Array(WIDTH_LIMIT).fill(false))
+      globalVisited.push(Array(WIDTH_LIMIT).fill(false))
     }
 
-    parent = []
+    globalParent = []
     for (let i = 0; i < HEIGHT_LIMIT; i++) {
-      parent.push(Array(WIDTH_LIMIT).fill(false))
+      globalParent.push(Array(WIDTH_LIMIT).fill(false))
     }
 
     xQueue = []
@@ -69,7 +69,7 @@ const findPath = (myX, myY, oppX, oppY) => {
     xQueue.push(myX)
     yQueue.push(myY)
 
-    visited[myY][myX] = true
+    globalVisited[myY][myX] = true
 
     while (xQueue.length > 0) {
       x = xQueue.shift()
@@ -91,12 +91,16 @@ const findPath = (myX, myY, oppX, oppY) => {
     }
 
     return endReached
-      ? parent
+      ? globalParent
       : -1
 }
 
-const findNextStep = (myX, myY, oppX, oppY, parent) => {    
-    let [x, y] = parent[oppY][oppX]
+const findNextStep = (myX, myY, oppX, oppY, parent) => {
+    // console.error('me:', myX, myY) // DEBUG
+    // console.error('opp:', oppX, oppY) // DEBUG
+    
+    let { x, y } = parent[oppY][oppX]
+    // console.error([x, y]) // DEBUG
     let nextX
     let nextY
     
@@ -106,9 +110,11 @@ const findNextStep = (myX, myY, oppX, oppY, parent) => {
         nextY = y
         
         if (parent[nextY][nextX]) {
-            x = parent[nextY][nextX][0]
-            y = parent[nextY][nextX][1]
+            x = parent[nextY][nextX].x
+            y = parent[nextY][nextX].y
         }
+
+        // console.error([x, y]) // DEBUG
     }
     
     return getNextDirection(myX, myY, nextX, nextY)
@@ -141,34 +147,95 @@ const DOWN = 'DOWN'
 const RIGHT = 'RIGHT'
 const LEFT = 'LEFT'
 
-const path = []
+const globalPath = []
 
-let lastHorizontalMove = RIGHT
-let lastVerticalMove = UP
+lastHorizontalMove = RIGHT
+lastVerticalMove = UP
 
 const nextStep = (...params) => {
     let result
 
-    if (canMoveRight(...params)) {
-        result = RIGHT
-    } else if (canMoveLeft(...params)) {
-        result = LEFT
-    } else if (lastVerticalMove === UP) {
-        result = canMoveUp(...params) ? UP : DOWN
-    } else {
-        result = canMoveDown(...params) ? DOWN : UP
+    // is a cutting edge? true
+
+    // for each possible direction, calculate the quantity of reachable empty spaces
+    const counter = countReachableSpaces(...params)
+    console.error('counter:', counter) // DEBUG
+
+    if (Object.values(counter).filter(count => count > 0).some((count1, count2) => count1 !== count2)) {
+      // then choose the step towards the biggest count
+      let maxStep
+      let maxCount = -Infinity
+      
+      Object.entries(counter).map(([step, count]) => {
+        if (count > maxCount) {
+          maxCount = count
+          maxStep = step
+        }
+      })
+
+      console.error('max:', [maxStep, maxCount]) // DEBUG
+      result = maxStep
     }
-    
-    if (result === UP || result === DOWN)
-        lastVerticalMove = result
+    else {
+      // else continue with the old strategy
+
+      // old strategy
+      if (canMoveRight(...params)) {
+          result = RIGHT
+      } else if (canMoveLeft(...params)) {
+          result = LEFT
+      } else if (lastVerticalMove === UP) {
+          result = canMoveUp(...params) ? UP : DOWN
+      } else {
+          result = canMoveDown(...params) ? DOWN : UP
+      }
+
+      if (result === UP || result === DOWN)
+          lastVerticalMove = result
+    }
     
     return result
 }
 
-const canMoveRight = (x1, y1, path) => x1 !== 29 && !path.some(([x, y]) => x === x1 + 1 && y === y1)
-const canMoveLeft = (x1, y1, path) => x1 !== 0 && !path.some(([x, y]) => x === x1 - 1 && y === y1)
-const canMoveUp = (x1, y1, path) => y1 !== 0 && !path.some(([x, y]) => x === x1 && y === y1 - 1)
-const canMoveDown = (x1, y1, path) => y1 !== 19 && !path.some(([x, y]) => x === x1 && y === y1 + 1)
+const countReachableSpaces = (currentX, currentY, path) => {
+  const counter = { [RIGHT]: 0, [LEFT]: 0, [UP]: 0, [DOWN]: 0 }
+
+  if (canMoveRight(currentX, currentY, path)) {
+    counter[RIGHT] = countSpaces(currentX + 1, currentY, globalGrid)
+  }
+
+  if (canMoveLeft(currentX, currentY, path)) {
+    counter[LEFT] = countSpaces(currentX - 1, currentY, globalGrid)
+  }
+
+  if (canMoveUp(currentX, currentY, path)) {
+    counter[UP] = countSpaces(currentX, currentY - 1, globalGrid)
+  }
+
+  if (canMoveDown(currentX, currentY, path)) {
+    counter[DOWN] = countSpaces(currentX, currentY + 1, globalGrid)
+  }
+
+  return counter
+}
+
+const countSpaces = (x, y, grid) => {
+  let finalCount = 0
+
+  findPath(x, y, -1, -1)
+
+  // countVisited nodes
+  for (let i = 0; i < HEIGHT_LIMIT; i++) {
+    finalCount += globalVisited[i].reduce((count, visited) => visited ? count + 1 : count, 0)
+  }
+  
+  return finalCount
+}
+
+const canMoveRight = (currentX, currentY, walls) => currentX !== 29 && !walls.some(([x, y]) => x === currentX + 1 && y === currentY)
+const canMoveLeft = (currentX, currentY, walls) => currentX !== 0 && !walls.some(([x, y]) => x === currentX - 1 && y === currentY)
+const canMoveUp = (currentX, currentY, walls) => currentY !== 0 && !walls.some(([x, y]) => x === currentX && y === currentY - 1)
+const canMoveDown = (currentX, currentY, walls) => currentY !== 19 && !walls.some(([x, y]) => x === currentX && y === currentY + 1)
 
 
 // game loop
@@ -184,10 +251,13 @@ while (true) {
         const x1 = parseInt(inputs[2]); // starting X coordinate of lightcycle (can be the same as X0 if you play before this player)
         const y1 = parseInt(inputs[3]); // starting Y coordinate of lightcycle (can be the same as Y0 if you play before this player)
         
-        path.push([x0, y0])
-        path.push([x1, y1])
-        grid[y0][x0] = true
-        grid[y1][x1] = true
+        // skip dead players
+        if (x1 === -1 && y1 === -1) continue
+
+        globalPath.push([x0, y0])
+        globalPath.push([x1, y1])
+        globalGrid[y0][x0] = true
+        globalGrid[y1][x1] = true
         
         if (i === P) {
             myX = x1
@@ -204,10 +274,12 @@ while (true) {
     
     if (hasPath) {
         const nextAttackStep = findNextStep(myX, myY, oppX, oppY, parentMatrix)
+        // console.error('nextAttackStep', nextAttackStep) // DEBUG
         console.log(nextAttackStep)
     } else {
-        const step = nextStep(myX, myY, path, oppX, oppY)
+        const step = nextStep(myX, myY, globalPath, oppX, oppY)
         console.log(step)
     }
+    
+    // if (count === 0) { printMatrix(grid); count++ } // DEBUG
 }
-
