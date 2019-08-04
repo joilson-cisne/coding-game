@@ -157,7 +157,7 @@ const nextStep = (...params) => {
 
     // for each possible direction, calculate the quantity of reachable empty spaces
     const counter = countReachableSpaces(...params)
-    console.error('counter:', counter) // DEBUG
+    // console.error('counter:', counter) // DEBUG
 
     if (Object.values(counter).filter(count => count > 0).some((count1, count2) => count1 !== count2)) {
       // then choose the step towards the biggest count
@@ -171,7 +171,7 @@ const nextStep = (...params) => {
         }
       })
 
-      console.error('max:', [maxStep, maxCount]) // DEBUG
+      // console.error('max:', [maxStep, maxCount]) // DEBUG
       result = maxStep
     }
     else {
@@ -244,9 +244,9 @@ const flatMap = array => array.reduce((acc, x) => acc.concat(x), [])
 while (true) {
     var inputs = readline().split(' ');
     const N = parseInt(inputs[0]); // total number of players (2 to 4).
-    const P = parseInt(inputs[1]); // your player number (0 to 3).
+    const me = parseInt(inputs[1]); // your player number (0 to 3).
 
-    for (let i = 0; i < N; i++) {
+    for (let player = 0; player < N; player++) {
         var inputs = readline().split(' ');
         const x0 = parseInt(inputs[0]); // starting X coordinate of lightcycle (or -1)
         const y0 = parseInt(inputs[1]); // starting Y coordinate of lightcycle (or -1)
@@ -255,19 +255,19 @@ while (true) {
         
         // skip dead players
         if (x1 === -1 && y1 === -1) {
-          globalBlocked[i] = []
+          globalBlocked[player] = []
           continue
         }
 
-        globalBlocked[i].push([x0, y0])
-        globalBlocked[i].push([x1, y1])
+        globalBlocked[player].push([x0, y0])
+        globalBlocked[player].push([x1, y1])
 
         // console.error('globalBlocked:', globalBlocked) // DEBUG
 
         globalGrid[y0][x0] = true
         globalGrid[y1][x1] = true
         
-        if (i === P) {
+        if (player === me) {
             myX = x1
             myY = y1
         } else {
