@@ -145,7 +145,7 @@ const DOWN = 'DOWN'
 const RIGHT = 'RIGHT'
 const LEFT = 'LEFT'
 
-const globalPath = []
+let globalPath = []
 
 lastHorizontalMove = RIGHT
 lastVerticalMove = UP
@@ -236,6 +236,9 @@ const canMoveUp = (currentX, currentY, walls) => currentY !== 0 && !walls.some((
 const canMoveDown = (currentX, currentY, walls) => currentY !== 19 && !walls.some(([x, y]) => x === currentX && y === currentY + 1)
 
 
+const globalBlocked = [[], [], [], []]
+const flatMap = array => array.reduce((acc, x) => acc.concat(x), [])
+
 // game loop
 while (true) {
     var inputs = readline().split(' ');
@@ -250,10 +253,20 @@ while (true) {
         const y1 = parseInt(inputs[3]); // starting Y coordinate of lightcycle (can be the same as Y0 if you play before this player)
         
         // skip dead players
+        if (x1 === -1 && y1 === -1) {
+          globalBlocked[i] = []
+          continue
+        }
+
+        globalBlocked[i].push([x0, y0])
+        globalBlocked[i].push([x1, y1])
+
+        // console.error('globalBlocked:', globalBlocked) // DEBUG
+
         if (x1 === -1 && y1 === -1) continue
 
-        globalPath.push([x0, y0])
-        globalPath.push([x1, y1])
+        // globalPath.push([x0, y0])
+        // globalPath.push([x1, y1])
         globalGrid[y0][x0] = true
         globalGrid[y1][x1] = true
         
@@ -266,6 +279,7 @@ while (true) {
         }
     }
     
+    globalPath = flatMap(globalBlocked)
     
     const parentMatrix = findPath(myX, myY, oppX, oppY)
     const hasPath = parentMatrix !== -1 && movesCount > 1
