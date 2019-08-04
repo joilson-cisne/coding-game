@@ -1,5 +1,3 @@
-// Challenge: https://www.codingame.com/multiplayer/bot-programming/tron-battle
-
 const WIDTH_LIMIT = 30
 const HEIGHT_LIMIT = 20
 
