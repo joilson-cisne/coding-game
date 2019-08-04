@@ -3,7 +3,8 @@
 ## TODO
 
 - [x] Consider space opened by dead players
-- [ ] Unify `globalGrid` and `globalPath` variables
+- [ ] Unify `globalGrid` and `globalPath` variables (FAILED)
+- [ ] If there is a bigger reachable space go for it
 - [ ] Remove unnecessary comments
 - [ ] Adapt the usage of `findPath` to 3 players
 - [ ] Use the concept of reachable frontier to decide the next step
