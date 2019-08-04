@@ -237,6 +237,7 @@ const canMoveDown = (currentX, currentY, walls) => currentY !== 19 && !walls.som
 
 
 const globalBlocked = [[], [], [], []]
+
 const flatMap = array => array.reduce((acc, x) => acc.concat(x), [])
 
 // game loop
@@ -263,10 +264,6 @@ while (true) {
 
         // console.error('globalBlocked:', globalBlocked) // DEBUG
 
-        if (x1 === -1 && y1 === -1) continue
-
-        // globalPath.push([x0, y0])
-        // globalPath.push([x1, y1])
         globalGrid[y0][x0] = true
         globalGrid[y1][x1] = true
         
