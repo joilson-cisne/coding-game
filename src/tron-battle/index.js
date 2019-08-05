@@ -148,79 +148,89 @@ const LEFT = 'LEFT'
 lastHorizontalMove = RIGHT
 lastVerticalMove = UP
 
-const nextStep = (...params) => {
-    let result
+const nextStep = (myX, myY, grid, oppX, oppY) => {
+  let result
 
-    // is a cutting edge? true
+  // TODO: DEDUP
+  const counter = countVisitableNodes(myX, myY, grid)
+  // console.error('counter:', counter) // DEBUG
 
-    // for each possible direction, calculate the quantity of reachable empty spaces
-    const counter = countReachableSpaces(...params)
-    // console.error('counter:', counter) // DEBUG
+  const isCuttingEdge = Object.values(counter)
+    .filter(count => count > 0)
+    .some((val, i, arr) => val !== arr[0])
 
-    if (Object.values(counter).filter(count => count > 0).some((count1, count2) => count1 !== count2)) {
-      // then choose the step towards the biggest count
-      let maxStep
-      let maxCount = -Infinity
-      
-      Object.entries(counter).map(([step, count]) => {
-        if (count > maxCount) {
-          maxCount = count
-          maxStep = step
-        }
-      })
+  if (isCuttingEdge) {
+    result = cuttingEdgeStrategy.nextStep(counter)
+  }
+  else {
+    const getNeighbor = neighborsOf(myX, myY)
 
-      // console.error('max:', [maxStep, maxCount]) // DEBUG
-      result = maxStep
+    // old strategy
+    if (canMoveTo(getNeighbor(RIGHT), grid)) {
+        result = RIGHT
+    } else if (canMoveTo(getNeighbor(LEFT), grid)) {
+        result = LEFT
+    } else if (lastVerticalMove === UP) {
+        result = canMoveTo(getNeighbor(UP), grid) ? UP : DOWN
+    } else {
+        result = canMoveTo(getNeighbor(DOWN), grid) ? DOWN : UP
     }
-    else {
-      // else continue with the old strategy
 
-      // old strategy
-      if (canMoveRight(...params)) {
-          result = RIGHT
-      } else if (canMoveLeft(...params)) {
-          result = LEFT
-      } else if (lastVerticalMove === UP) {
-          result = canMoveUp(...params) ? UP : DOWN
-      } else {
-          result = canMoveDown(...params) ? DOWN : UP
-      }
-
-      if (result === UP || result === DOWN)
-          lastVerticalMove = result
-    }
-    
-    return result
+    if (result === UP || result === DOWN)
+        lastVerticalMove = result
+  }
+  
+  return result
 }
 
-const countReachableSpaces = (currentX, currentY, path) => {
+const cuttingEdgeStrategy = {
+  nextStep: (counter) => {
+    let maxCountStep
+    let maxCount = -Infinity
+    
+    Object.entries(counter).map(([step, count]) => {
+      if (count > maxCount) {
+        maxCount = count
+        maxCountStep = step
+      }
+    })
+  
+    return maxCountStep
+  }
+}
+
+
+const neighborsOf = (x, y) => (step) => {
+  switch (step) {
+    case RIGHT: return { x: x + 1, y }
+    case LEFT: return { x: x - 1, y }
+    case UP: return { x, y: y - 1 }
+    case DOWN: return { x, y: y + 1 }
+    default:
+      throw new Error(`Invalid step: "${step}"`)
+  }
+}
+
+const countVisitableNodes = (currentX, currentY, grid) => {
   const counter = { [RIGHT]: 0, [LEFT]: 0, [UP]: 0, [DOWN]: 0 }
 
-  if (canMoveRight(currentX, currentY, path)) {
-    counter[RIGHT] = countSpaces(currentX + 1, currentY)
-  }
+  const getNeighbor = neighborsOf(currentX, currentY)
+  const steps = [RIGHT, LEFT, UP, DOWN]
 
-  if (canMoveLeft(currentX, currentY, path)) {
-    counter[LEFT] = countSpaces(currentX - 1, currentY)
-  }
-
-  if (canMoveUp(currentX, currentY, path)) {
-    counter[UP] = countSpaces(currentX, currentY - 1)
-  }
-
-  if (canMoveDown(currentX, currentY, path)) {
-    counter[DOWN] = countSpaces(currentX, currentY + 1)
-  }
+  steps.map(step => {
+    if (canMoveTo(getNeighbor(step), grid)) {
+      counter[step] = countVisitableNodesFrom(getNeighbor(step))
+    }
+  })
 
   return counter
 }
 
-const countSpaces = (x, y) => {
+const countVisitableNodesFrom = ({ x, y }) => {
   let finalCount = 0
 
   findPath(x, y, -1, -1)
 
-  // countVisited nodes
   for (let i = 0; i < HEIGHT_LIMIT; i++) {
     finalCount += globalVisited[i].reduce((count, visited) => visited ? count + 1 : count, 0)
   }
@@ -228,17 +238,12 @@ const countSpaces = (x, y) => {
   return finalCount
 }
 
-const canMoveRight = (currentX, currentY, grid) =>
-  currentX !== WIDTH_LIMIT - 1 && grid[currentY][currentX + 1] === false
+const canMoveTo = ({ x, y }, grid) => !isOutOfGrid(x, y) && !isCollision(x, y, grid)
 
-const canMoveLeft = (currentX, currentY, grid) =>
-  currentX !== 0 && grid[currentY][currentX - 1] === false
+const isOutOfGrid = (x, y) =>
+  x < 0 || y < 0 || x >= WIDTH_LIMIT || y >= HEIGHT_LIMIT
 
-const canMoveUp = (currentX, currentY, grid) =>
-  currentY !== 0 && grid[currentY - 1][currentX] === false
-
-const canMoveDown = (currentX, currentY, grid) =>
-  currentY !== HEIGHT_LIMIT - 1 && grid[currentY + 1][currentX] === false
+const isCollision = (x, y, grid) => grid[y][x] !== false
 
 const removeDeadPlayerFromGrid = (player) => {
   for (let y = 0; y < HEIGHT_LIMIT; y++) {
@@ -252,48 +257,55 @@ const removeDeadPlayerFromGrid = (player) => {
 
 // game loop
 while (true) {
-    var inputs = readline().split(' ');
-    const N = parseInt(inputs[0]); // total number of players (2 to 4).
-    const me = parseInt(inputs[1]); // your player number (0 to 3).
+  var inputs = readline().split(' ');
+  const N = parseInt(inputs[0]); // total number of players (2 to 4).
+  const me = parseInt(inputs[1]); // your player number (0 to 3).
 
-    for (let player = 0; player < N; player++) {
-        var inputs = readline().split(' ');
-        const x0 = parseInt(inputs[0]); // starting X coordinate of lightcycle (or -1)
-        const y0 = parseInt(inputs[1]); // starting Y coordinate of lightcycle (or -1)
-        const x1 = parseInt(inputs[2]); // starting X coordinate of lightcycle (can be the same as X0 if you play before this player)
-        const y1 = parseInt(inputs[3]); // starting Y coordinate of lightcycle (can be the same as Y0 if you play before this player)
-        
-        // skip dead players
-        if (x1 === -1 && y1 === -1) {
-          removeDeadPlayerFromGrid(player)
-          continue
-        }
+  for (let player = 0; player < N; player++) {
+      var inputs = readline().split(' ');
+      const x0 = parseInt(inputs[0]); // starting X coordinate of lightcycle (or -1)
+      const y0 = parseInt(inputs[1]); // starting Y coordinate of lightcycle (or -1)
+      const x1 = parseInt(inputs[2]); // starting X coordinate of lightcycle (can be the same as X0 if you play before this player)
+      const y1 = parseInt(inputs[3]); // starting Y coordinate of lightcycle (can be the same as Y0 if you play before this player)
+      
+      // skip dead players
+      if (x1 === -1 && y1 === -1) {
+        removeDeadPlayerFromGrid(player)
+        continue
+      }
 
-        globalGrid[y0][x0] = player
-        globalGrid[y1][x1] = player
+      globalGrid[y0][x0] = player
+      globalGrid[y1][x1] = player
 
-        // printMatrix(globalGrid) // DEBUG
+      // printMatrix(globalGrid) // DEBUG
 
-        if (player === me) {
-            myX = x1
-            myY = y1
-        } else {
-            oppX = x1
-            oppY = y1
-        }
-    }
+      if (player === me) {
+          myX = x1
+          myY = y1
+      } else {
+          oppX = x1
+          oppY = y1
+      }
+  }
+  
+  // TODO: DEDUP
+  const counter = countVisitableNodes(myX, myY, globalGrid)
+
+  const isCuttingEdge = Object.values(counter)
+    .filter(count => count > 0)
+    .some((val, i, arr) => val !== arr[0])
+
+  const parentMatrix = findPath(myX, myY, oppX, oppY)
+
+  const hasPath = parentMatrix !== -1 && movesCount > 1
     
-    const parentMatrix = findPath(myX, myY, oppX, oppY)
-    const hasPath = parentMatrix !== -1 && movesCount > 1
-    
-    if (hasPath) {
-        const nextAttackStep = findNextStep(myX, myY, oppX, oppY, parentMatrix)
-        // console.error('nextAttackStep', nextAttackStep) // DEBUG
-        console.log(nextAttackStep)
-    } else {
-        const step = nextStep(myX, myY, globalGrid, oppX, oppY)
-        console.log(step)
-    }
-    
-    // if (count === 0) { printMatrix(grid); count++ } // DEBUG
+  if (isCuttingEdge) {
+    console.log(cuttingEdgeStrategy.nextStep(counter))
+  } else if (hasPath) {
+    const nextAttackStep = findNextStep(myX, myY, oppX, oppY, parentMatrix)
+    console.log(nextAttackStep)
+  } else {
+    const step = nextStep(myX, myY, globalGrid, oppX, oppY)
+    console.log(step)
+  }
 }
