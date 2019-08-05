@@ -1,4 +1,4 @@
-import attackStrategy from './strategies/attackStrategy'
+import attackingStrategy from './strategies/attack'
 
 const WIDTH_LIMIT = 30
 const HEIGHT_LIMIT = 20
@@ -278,7 +278,7 @@ while (true) {
   if (isCuttingEdge) {
     console.log(cuttingEdgeStrategy.nextStep(counter))
   } else if (hasPath) {
-    const nextAttackStep = attackStrategy.nextStep(myX, myY, oppX, oppY, parentMatrix)
+    const nextAttackStep = attackingStrategy.nextStep(myX, myY, oppX, oppY, parentMatrix)
     console.log(nextAttackStep)
   } else {
     const step = nextStep(myX, myY, globalGrid, oppX, oppY)
