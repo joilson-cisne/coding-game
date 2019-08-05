@@ -72,8 +72,8 @@ const findPath = (myX, myY, oppX, oppY) => {
     globalVisited[myY][myX] = true
 
     while (xQueue.length > 0) {
-      x = xQueue.shift()
-      y = yQueue.shift()
+      let x = xQueue.shift()
+      let y = yQueue.shift()
 
       if (x === oppX && y === oppY) {
         endReached = true
@@ -116,8 +116,8 @@ const DOWN = 'DOWN'
 const RIGHT = 'RIGHT'
 const LEFT = 'LEFT'
 
-lastHorizontalMove = RIGHT
-lastVerticalMove = UP
+let lastHorizontalMove = RIGHT
+let lastVerticalMove = UP
 
 const nextStep = (myX, myY, grid, oppX, oppY) => {
   let result
@@ -231,6 +231,11 @@ while (true) {
   var inputs = readline().split(' ');
   const N = parseInt(inputs[0]); // total number of players (2 to 4).
   const me = parseInt(inputs[1]); // your player number (0 to 3).
+
+  let myX
+  let myY
+  let oppX
+  let oppY
 
   for (let player = 0; player < N; player++) {
       var inputs = readline().split(' ');
