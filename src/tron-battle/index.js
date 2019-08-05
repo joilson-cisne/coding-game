@@ -93,7 +93,8 @@ const findPath = (myX, myY, oppX, oppY) => {
       : -1
 }
 
-const findNextStep = (myX, myY, oppX, oppY, parent) => {
+const attackStrategy = {
+  nextStep: (myX, myY, oppX, oppY, parent) => {
     // console.error('me:', myX, myY) // DEBUG
     // console.error('opp:', oppX, oppY) // DEBUG
     
@@ -116,6 +117,7 @@ const findNextStep = (myX, myY, oppX, oppY, parent) => {
     }
     
     return getNextDirection(myX, myY, nextX, nextY)
+  }
 }
 
 const getNextDirection = (myX, myY, nextX, nextY) => {
@@ -302,7 +304,7 @@ while (true) {
   if (isCuttingEdge) {
     console.log(cuttingEdgeStrategy.nextStep(counter))
   } else if (hasPath) {
-    const nextAttackStep = findNextStep(myX, myY, oppX, oppY, parentMatrix)
+    const nextAttackStep = attackStrategy.nextStep(myX, myY, oppX, oppY, parentMatrix)
     console.log(nextAttackStep)
   } else {
     const step = nextStep(myX, myY, globalGrid, oppX, oppY)
