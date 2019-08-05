@@ -31,7 +31,7 @@ const exploreNeighborhood = (x, y, destX, destY) => {
 
     // Skip visited locations and blocked cells
     if (globalVisited[neighborY][neighborX]) continue
-    if (globalGrid[neighborY][neighborX] && (neighborX !== destX || neighborY !== destY)) continue
+    if (globalGrid[neighborY][neighborX] !== false && (neighborX !== destX || neighborY !== destY)) continue
 
     xQueue.push(neighborX)
     yQueue.push(neighborY)
@@ -129,7 +129,7 @@ const printMatrix = (matrix) => {
   for (let i = 0; i < HEIGHT_LIMIT; i++) {
     row = ''
     for(let j = 0; j < WIDTH_LIMIT; j++) {
-      if (matrix[i][j]) row += '*'
+      if (matrix[i][j] !== false) row += matrix[i][j]// '*'
       else row += '.'
     }
     row += '\n'
@@ -144,8 +144,6 @@ const UP = 'UP'
 const DOWN = 'DOWN'
 const RIGHT = 'RIGHT'
 const LEFT = 'LEFT'
-
-let globalPath = []
 
 lastHorizontalMove = RIGHT
 lastVerticalMove = UP
@@ -199,25 +197,25 @@ const countReachableSpaces = (currentX, currentY, path) => {
   const counter = { [RIGHT]: 0, [LEFT]: 0, [UP]: 0, [DOWN]: 0 }
 
   if (canMoveRight(currentX, currentY, path)) {
-    counter[RIGHT] = countSpaces(currentX + 1, currentY, globalGrid)
+    counter[RIGHT] = countSpaces(currentX + 1, currentY)
   }
 
   if (canMoveLeft(currentX, currentY, path)) {
-    counter[LEFT] = countSpaces(currentX - 1, currentY, globalGrid)
+    counter[LEFT] = countSpaces(currentX - 1, currentY)
   }
 
   if (canMoveUp(currentX, currentY, path)) {
-    counter[UP] = countSpaces(currentX, currentY - 1, globalGrid)
+    counter[UP] = countSpaces(currentX, currentY - 1)
   }
 
   if (canMoveDown(currentX, currentY, path)) {
-    counter[DOWN] = countSpaces(currentX, currentY + 1, globalGrid)
+    counter[DOWN] = countSpaces(currentX, currentY + 1)
   }
 
   return counter
 }
 
-const countSpaces = (x, y, grid) => {
+const countSpaces = (x, y) => {
   let finalCount = 0
 
   findPath(x, y, -1, -1)
@@ -230,15 +228,29 @@ const countSpaces = (x, y, grid) => {
   return finalCount
 }
 
-const canMoveRight = (currentX, currentY, walls) => currentX !== 29 && !walls.some(([x, y]) => x === currentX + 1 && y === currentY)
-const canMoveLeft = (currentX, currentY, walls) => currentX !== 0 && !walls.some(([x, y]) => x === currentX - 1 && y === currentY)
-const canMoveUp = (currentX, currentY, walls) => currentY !== 0 && !walls.some(([x, y]) => x === currentX && y === currentY - 1)
-const canMoveDown = (currentX, currentY, walls) => currentY !== 19 && !walls.some(([x, y]) => x === currentX && y === currentY + 1)
+const canMoveRight = (currentX, currentY, grid) =>
+  currentX !== 29 && grid[currentY][currentX + 1] === false
 
+const canMoveLeft = (currentX, currentY, grid) =>
+  currentX !== 0 && grid[currentY][currentX - 1] === false
 
-const globalBlocked = [[], [], [], []]
+const canMoveUp = (currentX, currentY, grid) =>
+  currentY !== 0 && grid[currentY - 1][currentX] === false
 
-const flatMap = array => array.reduce((acc, x) => acc.concat(x), [])
+const canMoveDown = (currentX, currentY, grid) =>
+  currentY !== 19 && grid[currentY + 1][currentX] === false
+
+const removeDeadPlayer = (grid, player) => {
+  for (let y = 0; y < HEIGHT_LIMIT; y++) {
+    for (let x = 0; x < WIDTH_LIMIT; x++) {
+      if (grid[y][x] === player) {
+        grid[y][x] = false
+      }
+    }
+  }
+
+  return grid
+}
 
 // game loop
 while (true) {
@@ -255,18 +267,15 @@ while (true) {
         
         // skip dead players
         if (x1 === -1 && y1 === -1) {
-          globalBlocked[player] = []
+          globalGrid = removeDeadPlayer(globalGrid, player)
           continue
         }
 
-        globalBlocked[player].push([x0, y0])
-        globalBlocked[player].push([x1, y1])
+        globalGrid[y0][x0] = player
+        globalGrid[y1][x1] = player
 
-        // console.error('globalBlocked:', globalBlocked) // DEBUG
+        // printMatrix(globalGrid) // DEBUG
 
-        globalGrid[y0][x0] = true
-        globalGrid[y1][x1] = true
-        
         if (player === me) {
             myX = x1
             myY = y1
@@ -276,8 +285,6 @@ while (true) {
         }
     }
     
-    globalPath = flatMap(globalBlocked)
-    
     const parentMatrix = findPath(myX, myY, oppX, oppY)
     const hasPath = parentMatrix !== -1 && movesCount > 1
     
@@ -286,7 +293,7 @@ while (true) {
         // console.error('nextAttackStep', nextAttackStep) // DEBUG
         console.log(nextAttackStep)
     } else {
-        const step = nextStep(myX, myY, globalPath, oppX, oppY)
+        const step = nextStep(myX, myY, globalGrid, oppX, oppY)
         console.log(step)
     }
     
