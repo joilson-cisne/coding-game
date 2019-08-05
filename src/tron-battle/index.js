@@ -229,7 +229,7 @@ const countSpaces = (x, y) => {
 }
 
 const canMoveRight = (currentX, currentY, grid) =>
-  currentX !== 29 && grid[currentY][currentX + 1] === false
+  currentX !== WIDTH_LIMIT - 1 && grid[currentY][currentX + 1] === false
 
 const canMoveLeft = (currentX, currentY, grid) =>
   currentX !== 0 && grid[currentY][currentX - 1] === false
@@ -238,7 +238,7 @@ const canMoveUp = (currentX, currentY, grid) =>
   currentY !== 0 && grid[currentY - 1][currentX] === false
 
 const canMoveDown = (currentX, currentY, grid) =>
-  currentY !== 19 && grid[currentY + 1][currentX] === false
+  currentY !== HEIGHT_LIMIT - 1 && grid[currentY + 1][currentX] === false
 
 const removeDeadPlayer = (grid, player) => {
   for (let y = 0; y < HEIGHT_LIMIT; y++) {

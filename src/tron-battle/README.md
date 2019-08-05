@@ -4,7 +4,7 @@
 
 - [x] Consider space opened by dead players
 - [x] Unify `globalGrid` and `globalPath` variables
-- [ ] Eliminate magical numbers
+- [x] Eliminate magical numbers
 - [ ] If there is a bigger reachable space go for it, even with path to the opponent
 - [ ] Remove unnecessary comments
 - [ ] Adapt the usage of `findPath` to 3 players
