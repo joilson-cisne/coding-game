@@ -1,3 +1,5 @@
+import attackStrategy from './strategies/attackStrategy'
+
 const WIDTH_LIMIT = 30
 const HEIGHT_LIMIT = 20
 
@@ -91,39 +93,6 @@ const findPath = (myX, myY, oppX, oppY) => {
     return endReached
       ? globalParent
       : -1
-}
-
-const attackStrategy = {
-  nextStep: (myX, myY, oppX, oppY, parent) => {
-    // console.error('me:', myX, myY) // DEBUG
-    // console.error('opp:', oppX, oppY) // DEBUG
-    
-    let { x, y } = parent[oppY][oppX]
-    // console.error([x, y]) // DEBUG
-    let nextX
-    let nextY
-    
-
-    while (x !== myX || y !== myY) {
-        nextX = x
-        nextY = y
-        
-        if (parent[nextY][nextX]) {
-            x = parent[nextY][nextX].x
-            y = parent[nextY][nextX].y
-        }
-
-        // console.error([x, y]) // DEBUG
-    }
-    
-    return getNextDirection(myX, myY, nextX, nextY)
-  }
-}
-
-const getNextDirection = (myX, myY, nextX, nextY) => {
-    return myX === nextX
-        ? myY < nextY ? 'DOWN' : 'UP'
-        : myX < nextX ? 'RIGHT' : 'LEFT'
 }
 
 const printMatrix = (matrix) => {
