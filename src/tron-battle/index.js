@@ -1,4 +1,5 @@
 import attackingStrategy from './strategies/attack'
+import cuttingEdgeStrategy from './strategies/cuttingEdge'
 
 const WIDTH_LIMIT = 30
 const HEIGHT_LIMIT = 20
@@ -153,23 +154,6 @@ const nextStep = (myX, myY, grid, oppX, oppY) => {
   
   return result
 }
-
-const cuttingEdgeStrategy = {
-  nextStep: (counter) => {
-    let maxCountStep
-    let maxCount = -Infinity
-    
-    Object.entries(counter).map(([step, count]) => {
-      if (count > maxCount) {
-        maxCount = count
-        maxCountStep = step
-      }
-    })
-  
-    return maxCountStep
-  }
-}
-
 
 const neighborsOf = (x, y) => (step) => {
   switch (step) {
