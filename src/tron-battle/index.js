@@ -240,16 +240,14 @@ const canMoveUp = (currentX, currentY, grid) =>
 const canMoveDown = (currentX, currentY, grid) =>
   currentY !== HEIGHT_LIMIT - 1 && grid[currentY + 1][currentX] === false
 
-const removeDeadPlayer = (grid, player) => {
+const removeDeadPlayerFromGrid = (player) => {
   for (let y = 0; y < HEIGHT_LIMIT; y++) {
     for (let x = 0; x < WIDTH_LIMIT; x++) {
-      if (grid[y][x] === player) {
-        grid[y][x] = false
+      if (globalGrid[y][x] === player) {
+        globalGrid[y][x] = false
       }
     }
   }
-
-  return grid
 }
 
 // game loop
@@ -267,7 +265,7 @@ while (true) {
         
         // skip dead players
         if (x1 === -1 && y1 === -1) {
-          globalGrid = removeDeadPlayer(globalGrid, player)
+          removeDeadPlayerFromGrid(player)
           continue
         }
 
