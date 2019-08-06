@@ -10,7 +10,7 @@
 - [x] split code into multiple files and create a script for creating a bundle
 - [ ] Use the concept of reachable frontier to decide the next step
 - [ ] Adapt the usage of `findPath` to 3 players
-- [ ] // TODO: DEDUP
+- [ ] // TODO: remove duplication
 - [ ] Remove unnecessary comments
 - [ ] Purify functions and eliminate global variables
 - [ ] generalize `printMatrix` to stop using global variables
