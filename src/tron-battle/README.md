@@ -9,6 +9,7 @@
 - [x] Stop pushing `[x0, y0]` on `globalPath` and `globalGrid` every time
 - [x] split code into multiple files and create a script for creating a bundle
 - [ ] Use the concept of reachable frontier to decide the next step
+- [ ] Improve the filling strategy
 - [ ] Adapt the usage of `findPath` to 3 players
 - [ ] // TODO: remove duplication
 - [ ] Remove unnecessary comments
