@@ -1,56 +1,9 @@
-import {
-  UP, DOWN, RIGHT, LEFT,
-  WIDTH_LIMIT, HEIGHT_LIMIT,
-} from './constants.js'
-
-import attackingStrategy from './strategies/attack'
-import cuttingEdgeStrategy from './strategies/cuttingEdge'
-
-import {
-  countVisitableNodes,
-  canMoveTo,
-  neighborsOf,
-  findPath,
-} from './utils'
+import bot from './bot'
+import { WIDTH_LIMIT, HEIGHT_LIMIT } from './constants.js'
 
 let globalGrid = []
 for (let i = 0; i < HEIGHT_LIMIT; i++) {
   globalGrid.push(Array(WIDTH_LIMIT).fill(false))
-}
-
-let lastVerticalMove = UP
-
-const nextStep = (myX, myY, grid) => {
-  let result
-
-  // TODO: remove duplication
-  const counter = countVisitableNodes(myX, myY, grid)
-  // console.error('counter:', counter) // DEBUG
-
-  const isCuttingEdge = Object.values(counter)
-    .filter(count => count > 0)
-    .some((val, i, arr) => val !== arr[0])
-
-  if (isCuttingEdge) {
-    result = cuttingEdgeStrategy.nextStep(counter)
-  } else {
-    const getNeighbor = neighborsOf(myX, myY)
-
-    // old strategy
-    if (canMoveTo(getNeighbor(RIGHT), grid)) {
-      result = RIGHT
-    } else if (canMoveTo(getNeighbor(LEFT), grid)) {
-      result = LEFT
-    } else if (lastVerticalMove === UP) {
-      result = canMoveTo(getNeighbor(UP), grid) ? UP : DOWN
-    } else {
-      result = canMoveTo(getNeighbor(DOWN), grid) ? DOWN : UP
-    }
-
-    if (result === UP || result === DOWN) lastVerticalMove = result
-  }
-
-  return result
 }
 
 const removeDeadPlayerFromGrid = (player, grid) => {
@@ -104,22 +57,5 @@ while (true) {
     }
   }
 
-  // TODO: remove duplication
-  const counter = countVisitableNodes(myX, myY, globalGrid)
-
-  const isCuttingEdge = Object.values(counter)
-    .filter(count => count > 0)
-    .some((val, i, arr) => val !== arr[0])
-
-  const { hasPath, parentsMatrix, movesCount } = findPath(myX, myY, oppX, oppY, globalGrid)
-
-  const shouldAttack = hasPath && movesCount > 1
-
-  if (isCuttingEdge) {
-    console.log(cuttingEdgeStrategy.nextStep(counter))
-  } else if (shouldAttack) {
-    console.log(attackingStrategy.nextStep(myX, myY, oppX, oppY, parentsMatrix))
-  } else {
-    console.log(nextStep(myX, myY, globalGrid, oppX, oppY))
-  }
+  console.log(bot.nextStep(myX, myY, globalGrid, oppX, oppY))
 }
