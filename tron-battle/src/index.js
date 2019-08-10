@@ -18,44 +18,44 @@ const removeDeadPlayerFromGrid = (player, grid) => {
   return grid
 }
 
+const deadFactory = currentPosition => (player) =>
+  currentPosition[player].x === -1
+  && currentPosition[player].y === -1
+
+
 // game loop
 while (true) {
   // eslint-disable-next-line no-undef
   var inputs = readline().split(' ')
   const N = parseInt(inputs[0]) // total number of players (2 to 4).
-  const me = parseInt(inputs[1]) // your player number (0 to 3).
+  const myIndex = parseInt(inputs[1]) // your player number (0 to 3).
 
-  let myX
-  let myY
-  let oppX
-  let oppY
+  let currentPosition = []
+  let isDead
 
   for (let player = 0; player < N; player++) {
+    // eslint-disable-next-line no-undef
     inputs = readline().split(' ')
     const x0 = parseInt(inputs[0]) // starting X coordinate of lightCycle (or -1)
     const y0 = parseInt(inputs[1]) // starting Y coordinate of lightCycle (or -1)
     const x1 = parseInt(inputs[2]) // starting X coordinate of lightCycle (can be the same as X0 if you play before this player)
     const y1 = parseInt(inputs[3]) // starting Y coordinate of lightCycle (can be the same as Y0 if you play before this player)
 
-    // skip dead players
-    if (x1 === -1 && y1 === -1) {
-      removeDeadPlayerFromGrid(player, globalGrid) // TODO: Check if this line works after
-      continue
-    }
+    currentPosition[player] = { x: x1, y: y1 }
 
-    globalGrid[y0][x0] = player
-    globalGrid[y1][x1] = player
+    isDead = deadFactory(currentPosition)
 
-    // printMatrix(globalGrid) // DEBUG
-
-    if (player === me) {
-      myX = x1
-      myY = y1
+    if (isDead(player)) {
+      removeDeadPlayerFromGrid(player, globalGrid)
     } else {
-      oppX = x1
-      oppY = y1
+      globalGrid[y0][x0] = player
+      globalGrid[y1][x1] = player
     }
   }
 
-  console.log(bot.nextStep(myX, myY, globalGrid, oppX, oppY))
+  const me = currentPosition[myIndex]
+  const liveOpponents = currentPosition
+    .filter((value, player) => player !== myIndex && !isDead(player))
+
+  console.log(bot.nextStep(me, liveOpponents, globalGrid))
 }
