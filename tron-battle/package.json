@@ -4,8 +4,8 @@
   "description": "## TODO",
   "main": "index.js",
   "scripts": {
-    "dev": "parcel index.js",
-    "build": "parcel build index.js"
+    "dev": "parcel ./src/index.js",
+    "build": "parcel build ./src/index.js"
   },
   "author": "",
   "license": "ISC",
