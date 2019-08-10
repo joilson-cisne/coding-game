@@ -54,6 +54,7 @@ let nodesInNextLater
 
 let xQueue
 let yQueue
+let playerQueue
 
 let globalVisited
 let globalParent
@@ -148,4 +149,67 @@ export const printMatrix = matrix => {
     finalPrint += row
   }
   console.error(finalPrint)
+}
+
+export const findFrontier = (sources, grid) => {
+  // Initial setup
+  globalVisited = []
+  for (let i = 0; i < HEIGHT_LIMIT; i++) {
+    globalVisited.push(Array(WIDTH_LIMIT).fill(false))
+  }
+
+  globalParent = []
+  for (let i = 0; i < HEIGHT_LIMIT; i++) {
+    globalParent.push(Array(WIDTH_LIMIT).fill(false))
+  }
+
+  xQueue = []
+  yQueue = []
+  playerQueue = []
+
+  // Algorithm start
+  sources.map((src, player) => {
+    // TODO: Convert into a single object
+    xQueue.push(src.x)
+    yQueue.push(src.y)
+    playerQueue.push(player)
+    
+    globalVisited[src.y][src.x] = player
+  })
+
+
+  while (xQueue.length > 0) {
+    let x = xQueue.shift()
+    let y = yQueue.shift()
+    let player = playerQueue.shift()
+    
+    exploreFrontierNeighborhood(x, y, player, grid)
+  }
+  
+  // printMatrix(globalVisited) // DEBUG
+
+  return  globalVisited
+}
+
+const exploreFrontierNeighborhood = (x, y, player, grid) => {
+  for (let i = 0; i < 4; i++) {
+    const neighborX = x + dx[i]
+    const neighborY = y + dy[i]
+
+    // Skip out of bounds locations
+    if (neighborX < 0 || neighborY < 0) continue
+    if (neighborX >= WIDTH_LIMIT || neighborY >= HEIGHT_LIMIT) continue
+
+    // Skip visited locations and blocked cells
+    if (globalVisited[neighborY][neighborX] !== false) continue
+    if (grid[neighborY][neighborX] !== false)
+      continue
+
+    xQueue.push(neighborX)
+    yQueue.push(neighborY)
+    playerQueue.push(player)
+    globalVisited[neighborY][neighborX] = player
+    globalParent[neighborY][neighborX] = { x, y }
+    nodesInNextLater++
+  }
 }
