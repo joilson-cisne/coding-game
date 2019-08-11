@@ -29,8 +29,8 @@ while (true) {
   const N = parseInt(inputs[0]) // total number of players (2 to 4).
   const myPlayerIndex = parseInt(inputs[1]) // your player number (0 to 3).
 
-  let livePlayers = []
-
+  let livePlayersPositions = []
+ 
   for (let player = 0; player < N; player++) {
     // eslint-disable-next-line no-undef
     inputs = readline().split(' ')
@@ -44,11 +44,11 @@ while (true) {
     if (isDead(playerPosition)) {
       removeDeadPlayerFromGrid(player, globalGrid)
     } else {
-      livePlayers.push(playerPosition)
+      livePlayersPositions.push(playerPosition)
       globalGrid[y0][x0] = player
       globalGrid[y1][x1] = player
     }
   }
 
-  console.log(bot.nextStep(livePlayers, myPlayerIndex, globalGrid))
+  console.log(bot.nextStep(livePlayersPositions, myPlayerIndex, globalGrid))
 }
