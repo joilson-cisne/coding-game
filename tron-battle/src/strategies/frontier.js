@@ -1,11 +1,11 @@
 import { neighborsOf, canMoveTo, findFrontier } from '../utils'
 import { RIGHT, LEFT, UP, DOWN } from '../constants'
 
-const nextStep = (players, me, grid) => {
+const nextStep = (positions, me, grid) => {
   let maxSizeStep
   let maxSize = -Infinity
 
-  const sizeByStep = territorySizeOnNextStep(players, me, grid)
+  const sizeByStep = territorySizeOnNextStep(positions, me, grid)
   console.error('sizeByStep:', sizeByStep) // DEBUG
 
   Object.entries(sizeByStep).map(([step, size]) => {
@@ -18,15 +18,15 @@ const nextStep = (players, me, grid) => {
   return maxSizeStep
 }
 
-const territorySizeOnNextStep = (positions, me, grid) => {
+const territorySizeOnNextStep = (positions, player, grid) => {
   const countByStep = { [RIGHT]: 0, [LEFT]: 0, [UP]: 0, [DOWN]: 0 }
 
-  const getMyNeighbor = neighborsOf(positions[me].x, positions[me].y)
+  const getMyNeighbor = neighborsOf(positions[player].x, positions[player].y)
   const steps = [RIGHT, LEFT, UP, DOWN]
 
   steps.map(step => {
     if (canMoveTo(getMyNeighbor(step), grid)) {
-      const positionsOnNextStep = positions.map(position => position.player === me
+      const positionsOnNextStep = positions.map(position => position.player === player
         ? {
           ...position,
           ...getMyNeighbor(step),
@@ -39,7 +39,7 @@ const territorySizeOnNextStep = (positions, me, grid) => {
       const territoriesSize = getSize(territories)
       console.error('territoriesSize:', territoriesSize) // DEBUG
 
-      countByStep[step] = territoriesSize[me]
+      countByStep[step] = territoriesSize[player]
     }
   })
 
