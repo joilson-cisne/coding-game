@@ -1,5 +1,9 @@
-import { neighborsOf, canMoveTo, findFrontier } from '../utils'
-import { RIGHT, LEFT, UP, DOWN } from '../constants'
+import { neighborsOf, canMoveTo, isOutOfGrid, isCollision, isVisited } from '../utils'
+import {
+  RIGHT, LEFT, UP, DOWN,
+  HEIGHT_LIMIT, WIDTH_LIMIT,
+  DX, DY,
+} from '../constants'
 
 const nextStep = (positions, me, grid) => {
   let maxSizeStep
@@ -18,6 +22,7 @@ const nextStep = (positions, me, grid) => {
   return maxSizeStep
 }
 
+// TODO: Split into smaller functions
 const territorySizeOnNextStep = (positions, player, grid) => {
   const countByStep = { [RIGHT]: 0, [LEFT]: 0, [UP]: 0, [DOWN]: 0 }
 
@@ -58,6 +63,50 @@ const getSize = (territories) => {
   return sizes
 }
 
+const findFrontier = (sources, grid) => {
+  // Initial setup
+  const visited = []
+  for (let i = 0; i < HEIGHT_LIMIT; i++) {
+    visited.push(Array(WIDTH_LIMIT).fill(false))
+  }
+
+  const positionsQueue = []
+
+  // Algorithm start
+  sources.map(src => {
+    positionsQueue.push(src)
+    visited[src.y][src.x] = src.player
+  })
+
+  while (positionsQueue.length > 0) {
+    let position = positionsQueue.shift()
+    
+    exploreFrontierNeighborhood(position, { grid, positionsQueue, visited })
+  }
+
+  return  visited
+}
+
+const exploreFrontierNeighborhood = ({ x, y, player }, config) => {
+  const { positionsQueue, visited } = config
+
+  for (let i = 0; i < 4; i++) {
+    const neighborX = x + DX[i]
+    const neighborY = y + DY[i]
+
+    const newPosition = { x: neighborX, y: neighborY, player }
+
+    if (isValid(newPosition, config)) {
+      positionsQueue.push({ x: neighborX, y: neighborY, player})
+      visited[neighborY][neighborX] = player
+    }
+  }
+}
+
+const isValid = ({ x, y }, { grid, visited }) =>
+  !isOutOfGrid(x, y)
+  && !isVisited(x, y, visited)
+  && !isCollision(x, y, grid)
 
 export default {
   nextStep,
