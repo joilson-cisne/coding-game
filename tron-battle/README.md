@@ -10,10 +10,8 @@
 - [x] split code into multiple files and create a script for creating a bundle
 - [x] // TODO: remove duplication
 - [x] Use the concept of reachable frontier to decide the next step
-- [ ] Avoid being naively trapped when attack opponent
+- [ ] Implement a minimax based on the frontier strategy
 - [ ] Improve the filling strategy
-- [ ] Adapt the usage of `findPath` to 3 players
-- [ ] Remove unnecessary comments
-- [ ] Purify functions and eliminate global variables
 - [ ] generalize `printMatrix` to stop using global variables
 - [ ] Add tests
+- [ ] Avoid being naively trapped when attack opponent
