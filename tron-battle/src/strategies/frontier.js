@@ -40,7 +40,7 @@ const territorySizeOnNextStep = (positions, player, grid) => {
         : position
       )
 
-      const territories = findFrontier(positionsOnNextStep, grid)
+      const territories = findFrontier(positionsOnNextStep, player, grid)
 
       const territoriesSize = getSize(territories)
       console.error('territoriesSize:', territoriesSize) // DEBUG
@@ -64,7 +64,7 @@ const getSize = (territories) => {
   return sizes
 }
 
-const findFrontier = (sources, grid) => {
+const findFrontier = (sources, player, grid) => {
   // Initial setup
   const visited = []
   for (let i = 0; i < HEIGHT_LIMIT; i++) {
@@ -75,8 +75,17 @@ const findFrontier = (sources, grid) => {
 
   // Algorithm start
   sources.map(src => {
-    positionsQueue.push(src)
-    visited[src.y][src.x] = src.player
+    if (src.player !== player) {
+      positionsQueue.push(src)
+      visited[src.y][src.x] = src.player
+    }
+  })
+
+  sources.map(src => {
+    if (src.player === player) {
+      positionsQueue.push(src)
+      visited[src.y][src.x] = src.player
+    }
   })
 
   while (positionsQueue.length > 0) {
@@ -98,7 +107,7 @@ const exploreFrontierNeighborhood = ({ x, y, player }, config) => {
     const newPosition = { x: neighborX, y: neighborY, player }
 
     if (isValid(newPosition, config)) {
-      positionsQueue.push({ x: neighborX, y: neighborY, player})
+      positionsQueue.push(newPosition)
       visited[neighborY][neighborX] = player
     }
   }
