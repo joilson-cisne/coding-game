@@ -26,15 +26,16 @@ const nextStep = (positions, me, grid) => {
 const territorySizeOnNextStep = (positions, player, grid) => {
   const countByStep = { [RIGHT]: 0, [LEFT]: 0, [UP]: 0, [DOWN]: 0 }
 
-  const getMyNeighbor = neighborsOf(positions[player].x, positions[player].y)
+  const playerPosition = positions.find(p => p.player === player)
+  const getNeighbor = neighborsOf(playerPosition.x, playerPosition.y)
   const steps = [RIGHT, LEFT, UP, DOWN]
 
   steps.map(step => {
-    if (canMoveTo(getMyNeighbor(step), grid)) {
+    if (canMoveTo(getNeighbor(step), grid)) {
       const positionsOnNextStep = positions.map(position => position.player === player
         ? {
           ...position,
-          ...getMyNeighbor(step),
+          ...getNeighbor(step),
         }
         : position
       )
