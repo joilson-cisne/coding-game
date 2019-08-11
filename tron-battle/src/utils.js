@@ -21,6 +21,8 @@ export const isOutOfGrid = (x, y) => x < 0 || y < 0 || x >= WIDTH_LIMIT || y >= 
 
 export const isCollision = (x, y, grid) => grid[y][x] !== false
 
+export const isVisited = (x, y, visited) => visited[y][x] !== false
+
 export const countVisitableNodesFrom = ({ x, y }, grid) => {
   let finalCount = 0
 
