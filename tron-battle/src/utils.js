@@ -1,4 +1,4 @@
-import { RIGHT, LEFT, UP, DOWN, WIDTH_LIMIT, HEIGHT_LIMIT } from './constants'
+import { RIGHT, LEFT, UP, DOWN, WIDTH_LIMIT, HEIGHT_LIMIT, DX, DY } from './constants'
 
 export const countVisitableNodes = (currentX, currentY, grid) => {
   const counter = { [RIGHT]: 0, [LEFT]: 0, [UP]: 0, [DOWN]: 0 }
@@ -111,14 +111,10 @@ export const findPath = (myX, myY, oppX, oppY, grid) => {
   return { parentsMatrix: globalParent, movesCount, hasPath: endReached }
 }
 
-// UP, DOWN, LEFT, RIGHT direction vectors
-const dx = [-1, 1, 0, 0]
-const dy = [0, 0, -1, 1]
-
 const exploreNeighborhood = (x, y, destX, destY, grid) => {
   for (let i = 0; i < 4; i++) {
-    const neighborX = x + dx[i]
-    const neighborY = y + dy[i]
+    const neighborX = x + DX[i]
+    const neighborY = y + DY[i]
 
     // Skip out of bounds locations
     if (neighborX < 0 || neighborY < 0) continue
