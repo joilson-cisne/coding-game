@@ -18,20 +18,18 @@ const removeDeadPlayerFromGrid = (player, grid) => {
   return grid
 }
 
-const deadFactory = currentPosition => (player) =>
-  currentPosition[player].x === -1
-  && currentPosition[player].y === -1
-
+const isDead = position =>
+  position.x === -1
+  && position.y === -1
 
 // game loop
 while (true) {
   // eslint-disable-next-line no-undef
   var inputs = readline().split(' ')
   const N = parseInt(inputs[0]) // total number of players (2 to 4).
-  const myIndex = parseInt(inputs[1]) // your player number (0 to 3).
+  const myPlayerIndex = parseInt(inputs[1]) // your player number (0 to 3).
 
-  let currentPosition = []
-  let isDead
+  let livePlayers = []
 
   for (let player = 0; player < N; player++) {
     // eslint-disable-next-line no-undef
@@ -41,21 +39,16 @@ while (true) {
     const x1 = parseInt(inputs[2]) // starting X coordinate of lightCycle (can be the same as X0 if you play before this player)
     const y1 = parseInt(inputs[3]) // starting Y coordinate of lightCycle (can be the same as Y0 if you play before this player)
 
-    currentPosition[player] = { x: x1, y: y1 }
+    const playerPosition = { x: x1, y: y1, player }
 
-    isDead = deadFactory(currentPosition)
-
-    if (isDead(player)) {
+    if (isDead(playerPosition)) {
       removeDeadPlayerFromGrid(player, globalGrid)
     } else {
+      livePlayers.push(playerPosition)
       globalGrid[y0][x0] = player
       globalGrid[y1][x1] = player
     }
   }
 
-  const me = currentPosition[myIndex]
-  const liveOpponents = currentPosition
-    .filter((value, player) => player !== myIndex && !isDead(player))
-
-  console.log(bot.nextStep(me, liveOpponents, globalGrid))
+  console.log(bot.nextStep(livePlayers, myPlayerIndex, globalGrid))
 }

@@ -168,28 +168,14 @@ export const findFrontier = (sources, grid) => {
   playerQueue = []
 
   // Algorithm start
-  sources.map((src, player) => {
-    if (player !== 0) {
-      // TODO: Convert into a single object
-      xQueue.push(src.x)
-      yQueue.push(src.y)
-      playerQueue.push(player)
-      
-      globalVisited[src.y][src.x] = player
-    }
+  sources.map(src => {
+    // TODO: Convert into a single object
+    xQueue.push(src.x)
+    yQueue.push(src.y)
+    playerQueue.push(src.player)
+    
+    globalVisited[src.y][src.x] = src.player
   })
-
-  // TODO: Refactor to remove duplication
-  // Opponents explore first
-  const myId = 0
-  const me = sources[myId]
-
-  xQueue.push(me.x)
-  yQueue.push(me.y)
-  playerQueue.push(myId)
-  
-  globalVisited[me.y][me.x] = myId
-  // END: Opponents explore first
 
   while (xQueue.length > 0) {
     let x = xQueue.shift()
@@ -198,8 +184,6 @@ export const findFrontier = (sources, grid) => {
     
     exploreFrontierNeighborhood(x, y, player, grid)
   }
-  
-  // printMatrix(globalVisited) // DEBUG
 
   return  globalVisited
 }
