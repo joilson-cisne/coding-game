@@ -10,7 +10,6 @@ const nextStep = (positions, me, grid) => {
   let maxSize = -Infinity
 
   const sizeByStep = territorySizeOnNextStep(positions, me, grid)
-  console.error('sizeByStep:', sizeByStep) // DEBUG
 
   Object.entries(sizeByStep).map(([step, size]) => {
     if (size > maxSize) {
@@ -43,7 +42,6 @@ const territorySizeOnNextStep = (positions, player, grid) => {
       const territories = findFrontier(positionsOnNextStep, player, grid)
 
       const territoriesSize = getSize(territories)
-      console.error('territoriesSize:', territoriesSize) // DEBUG
 
       countByStep[step] = territoriesSize[player]
     }
