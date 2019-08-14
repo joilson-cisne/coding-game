@@ -1,7 +1,7 @@
 import { RIGHT, LEFT, UP, DOWN, WIDTH_LIMIT, HEIGHT_LIMIT, DX, DY } from './constants'
 
 
-export const removeDeadPlayerFromGrid = (player, grid) => grid.map(row => row.map(p => p === player && false))
+export const removeDeadPlayerFromGrid = (player, grid) => grid.map(row => row.map(p => p === player ? false : p))
 
 export const isDead = position => position.x === -1 && position.y === -1
 
