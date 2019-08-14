@@ -1,5 +1,10 @@
 import { RIGHT, LEFT, UP, DOWN, WIDTH_LIMIT, HEIGHT_LIMIT, DX, DY } from './constants'
 
+
+export const removeDeadPlayerFromGrid = (player, grid) => grid.map(row => row.map(p => p === player && false))
+
+export const isDead = position => position.x === -1 && position.y === -1
+
 export const countVisitableNodes = (currentX, currentY, grid) => {
   const counter = { [RIGHT]: 0, [LEFT]: 0, [UP]: 0, [DOWN]: 0 }
 
