@@ -51,21 +51,48 @@ const getAlphabetOperatorAndCount = (currentIndex, targetIndex) => {
     return { operator, count }
 }
 
-const getCommand = (registers, currentRegister, target) => {
-    // console.error('Current register:', currentRegister)
-    // console.error('Filled registers:', registers.filter(r => r != ' ').length)
+const getRegisterOperatorAndCount = (origin, destination) => {
+    let operator = ''
+
+    const diff = destination - origin
+
+    const mod1 = mod(diff, TOTAL_REGISTERS)
+    const mod2 = mod(-diff, TOTAL_REGISTERS)
+    
+    if (mod1 < mod2) {
+        operator = '>'
+    } else if (mod2 < mod1) {
+        operator = '<'
+    }
+
+    count = Math.min(mod1, mod2)
+
+    return { operator, count }
+}
+
+
+const getMovingLetterCommand = (origin, target) => {
     let command = ''
 
-    const currentAlphabetIndex = getAlphabetIndex(registers[currentRegister])
-    // console.error('currentAlphabetIndex', currentAlphabetIndex)
+    const currentAlphabetIndex = getAlphabetIndex(origin)
     const targetAlphabetIndex = getAlphabetIndex(target)
-    // console.error('targetAlphabetIndex', targetAlphabetIndex)
 
     const { operator, count } = getAlphabetOperatorAndCount(currentAlphabetIndex, targetAlphabetIndex)
 
     // console.error({ operator, count })
     command += operator.repeat(count)
-    command += '.'
+    command += '.' // TODO: remove this responsibility from here
+
+    return command
+}
+
+const getMovingRegisterCommand = (origin, destination) => {
+    let command = ''
+
+    const { operator, count } = getRegisterOperatorAndCount(origin, destination)
+
+    // console.error({ operator, count })
+    command += operator.repeat(count)
 
     return command
 }
@@ -76,7 +103,7 @@ magicPhrase.split('').map(target => {
     let minCommand = ''
 
     for (let i = 0; i < TOTAL_REGISTERS; i++) {
-        let tempCommand = getCommand(registers, i, target)
+        let tempCommand = getMovingLetterCommand(registers[i], target)
         let tempCommandLength = tempCommand.length
 
         if (tempCommandLength < minCommandSize) {
@@ -87,6 +114,7 @@ magicPhrase.split('').map(target => {
     }
 
     registers[selectedRegister] = target
+    result += getMovingRegisterCommand(currentRegister, selectedRegister)
     result += minCommand
 })
 
