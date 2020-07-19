@@ -77,17 +77,17 @@ magicPhrase.split('').map(target => {
 
     for (let i = 0; i < TOTAL_REGISTERS; i++) {
         let tempCommand = getCommand(registers, i, target)
+        let tempCommandLength = tempCommand.length
 
-        if (commandSize < minCommandSize) {
-            minCommandSize = commandSize
+        if (tempCommandLength < minCommandSize) {
+            minCommandSize = tempCommandLength
             selectedRegister = i
             minCommand = tempCommand
         }
     }
 
     registers[selectedRegister] = target
-
-    result += command
+    result += minCommand
 })
 
 console.log(result);
