@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "multi-register": "node multi-register-strategy.js"
   },
   "author": "",
   "license": "ISC"
