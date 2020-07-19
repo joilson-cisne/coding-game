@@ -7,7 +7,7 @@
  */
 
 // const magicPhrase = readline();
-const magicPhrase = process.argv[2] || 'AZ';
+const magicPhrase = process.argv[2] || 'MINAS';
 
 // Start your code here
 
@@ -34,15 +34,16 @@ const incrementRegister = register => mod(register + 1, TOTAL_REGISTERS)
 
 const getAlphabetOperatorAndCount = (currentIndex, targetIndex) => {
     let operator = ''
+    let count = 0
 
     const diff = targetIndex - currentIndex
 
     const mod1 = mod(diff, ALPHABET_SIZE)
     const mod2 = mod(-diff, ALPHABET_SIZE)
 
-    if (mod1 < mod2) {
+    if (mod1 <= mod2) {
         operator = '+'
-    } else if (mod2 < mod1) {
+    } else {
         operator = '-'
     }
 
@@ -53,15 +54,16 @@ const getAlphabetOperatorAndCount = (currentIndex, targetIndex) => {
 
 const getRegisterOperatorAndCount = (origin, destination) => {
     let operator = ''
+    let count = 0
 
     const diff = destination - origin
 
     const mod1 = mod(diff, TOTAL_REGISTERS)
     const mod2 = mod(-diff, TOTAL_REGISTERS)
     
-    if (mod1 < mod2) {
+    if (mod1 <= mod2) {
         operator = '>'
-    } else if (mod2 < mod1) {
+    } else {
         operator = '<'
     }
 
@@ -69,7 +71,6 @@ const getRegisterOperatorAndCount = (origin, destination) => {
 
     return { operator, count }
 }
-
 
 const getMovingLetterCommand = (origin, target) => {
     let command = ''
@@ -103,18 +104,22 @@ magicPhrase.split('').map(target => {
     let minCommand = ''
 
     for (let i = 0; i < TOTAL_REGISTERS; i++) {
-        let tempCommand = getMovingLetterCommand(registers[i], target)
-        let tempCommandLength = tempCommand.length
+        let tempLetterCommand = getMovingLetterCommand(registers[i], target)
+        let tempLetterCommandLength = tempLetterCommand.length
 
-        if (tempCommandLength < minCommandSize) {
-            minCommandSize = tempCommandLength
+        let tempRegisterCommand = getMovingRegisterCommand(currentRegister, i)
+        let tempRegisterCommandLength = tempRegisterCommand.length
+        
+        if (tempLetterCommandLength + tempRegisterCommandLength < minCommandSize) {
+            minCommandSize = tempLetterCommandLength + tempRegisterCommandLength
             selectedRegister = i
-            minCommand = tempCommand
+            minCommand = tempRegisterCommand + tempLetterCommand
         }
     }
 
     registers[selectedRegister] = target
-    result += getMovingRegisterCommand(currentRegister, selectedRegister)
+    currentRegister = selectedRegister
+    
     result += minCommand
 })
 
