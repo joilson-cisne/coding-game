@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "single-register": "node single-register-strategy.js",
     "multi-register": "node multi-register-strategy.js"
   },
   "author": "",
