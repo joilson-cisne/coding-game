@@ -3,4 +3,6 @@
 ## TODO
 
 - [x] Pass in all test case, with any strategy
-- [ ] Try a strategy that use more then one register
+- [x] Try a strategy that uses more then one register
+- [ ] Clean the code
+- [ ] Try a strategy that uses the loop command
