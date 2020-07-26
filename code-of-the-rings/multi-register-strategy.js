@@ -80,7 +80,6 @@ const getMovingLetterCommand = (origin, target) => {
 
     const { operator, count } = getAlphabetOperatorAndCount(currentAlphabetIndex, targetAlphabetIndex)
 
-    // console.error({ operator, count })
     command += operator.repeat(count)
     command += '.' // TODO: remove this responsibility from here
 
@@ -92,7 +91,6 @@ const getMovingRegisterCommand = (origin, destination) => {
 
     const { operator, count } = getRegisterOperatorAndCount(origin, destination)
 
-    // console.error({ operator, count })
     command += operator.repeat(count)
 
     return command
