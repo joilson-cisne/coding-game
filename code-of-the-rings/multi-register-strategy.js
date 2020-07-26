@@ -80,21 +80,28 @@ const getMovingRegisterCommand = (origin, destination) => {
     return command
 }
 
-magicPhrase.split('').map(targetLetter => {
+const getShortestCommandTo = (targetLetter) => {
+    let shortestCommand = ''
     let shortestCommandLength = Infinity
     let selectedRegister = 0
-    let shortestCommand = ''
 
     for (let i = 0; i < TOTAL_REGISTERS; i++) {
-        let tempCommand = getMovingCommand(i, targetLetter);
+        let command = getMovingCommand(i, targetLetter);
         
-        if (tempCommand.length < shortestCommandLength) {
-            shortestCommandLength = tempCommand.length
+        if (command.length < shortestCommandLength) {
+            shortestCommandLength = command.length
             selectedRegister = i
-            shortestCommand = tempCommand
+            shortestCommand = command
         }
     }
 
+    return { shortestCommand, selectedRegister }
+}
+
+
+magicPhrase.split('').map(targetLetter => {
+    let { shortestCommand, selectedRegister } = getShortestCommandTo(targetLetter)
+    
     registers[selectedRegister] = targetLetter
     currentRegister = selectedRegister
     
