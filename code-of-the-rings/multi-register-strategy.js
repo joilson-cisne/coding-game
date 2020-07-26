@@ -59,7 +59,6 @@ const getMovingLetterCommand = (origin, target) => {
     const { operator, count } = getOperatorAndCount(currentAlphabetIndex, targetAlphabetIndex, { increase: '+', decrease: '-'}, ALPHABET_SIZE)
 
     command += operator.repeat(count)
-    command += '.' // TODO: remove this responsibility from here
 
     return command
 }
@@ -96,7 +95,7 @@ magicPhrase.split('').map(target => {
     registers[selectedRegister] = target
     currentRegister = selectedRegister
     
-    result += minCommand
+    result += minCommand + '.'
 })
 
 console.log(result);
