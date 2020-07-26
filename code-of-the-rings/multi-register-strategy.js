@@ -51,10 +51,10 @@ const getOperatorAndCount = (currentIndex, targetIndex, operators, loopSize) => 
 }
 
 const getMovingCommand = (destinationRegister, targetLetter) => {
-    let tempRegisterCommand = getMovingRegisterCommand(currentRegister, destinationRegister)
-    let tempLetterCommand = getMovingLetterCommand(registers[destinationRegister], targetLetter)
+    let registerCommand = getMovingRegisterCommand(currentRegister, destinationRegister)
+    let letterCommand = getMovingLetterCommand(registers[destinationRegister], targetLetter)
 
-    return tempRegisterCommand + tempLetterCommand
+    return registerCommand + letterCommand
 }
 
 const getMovingLetterCommand = (origin, target) => {
