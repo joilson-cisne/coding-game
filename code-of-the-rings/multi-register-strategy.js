@@ -32,40 +32,18 @@ const mod = (a, b) => ((a % b) + b) % b
 
 const incrementRegister = register => mod(register + 1, TOTAL_REGISTERS)
 
-const getAlphabetOperatorAndCount = (currentIndex, targetIndex) => {
+const getOperatorAndCount = (currentIndex, targetIndex, operators, loopSize) => {
     let operator = ''
     let count = 0
 
     const diff = targetIndex - currentIndex
 
-    const mod1 = mod(diff, ALPHABET_SIZE)
-    const mod2 = mod(-diff, ALPHABET_SIZE)
+    const mod1 = mod(diff, loopSize)
+    const mod2 = mod(-diff, loopSize)
 
-    if (mod1 <= mod2) {
-        operator = '+'
-    } else {
-        operator = '-'
-    }
-
-    count = Math.min(mod1, mod2)
-
-    return { operator, count }
-}
-
-const getRegisterOperatorAndCount = (origin, destination) => {
-    let operator = ''
-    let count = 0
-
-    const diff = destination - origin
-
-    const mod1 = mod(diff, TOTAL_REGISTERS)
-    const mod2 = mod(-diff, TOTAL_REGISTERS)
-    
-    if (mod1 <= mod2) {
-        operator = '>'
-    } else {
-        operator = '<'
-    }
+    operator = mod1 <= mod2
+        ? operators.increase
+        : operators.decrease
 
     count = Math.min(mod1, mod2)
 
@@ -78,7 +56,7 @@ const getMovingLetterCommand = (origin, target) => {
     const currentAlphabetIndex = getAlphabetIndex(origin)
     const targetAlphabetIndex = getAlphabetIndex(target)
 
-    const { operator, count } = getAlphabetOperatorAndCount(currentAlphabetIndex, targetAlphabetIndex)
+    const { operator, count } = getOperatorAndCount(currentAlphabetIndex, targetAlphabetIndex, { increase: '+', decrease: '-'}, ALPHABET_SIZE)
 
     command += operator.repeat(count)
     command += '.' // TODO: remove this responsibility from here
@@ -89,7 +67,7 @@ const getMovingLetterCommand = (origin, target) => {
 const getMovingRegisterCommand = (origin, destination) => {
     let command = ''
 
-    const { operator, count } = getRegisterOperatorAndCount(origin, destination)
+    const { operator, count } = getOperatorAndCount(origin, destination, { increase: '>', decrease: '<'}, TOTAL_REGISTERS)
 
     command += operator.repeat(count)
 
