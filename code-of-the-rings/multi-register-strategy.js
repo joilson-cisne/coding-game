@@ -27,9 +27,7 @@ const getAlphabetIndex = (letter) => {
 
 const mod = (a, b) => ((a % b) + b) % b
 
-const incrementRegister = register => mod(register + 1, TOTAL_REGISTERS)
-
-const getOperatorAndCount = (current, target, operators, loopSize) => {
+const getCommand = (current, target, operators, loopSize) => {
     let operator = ''
     let count = 0
 
@@ -44,10 +42,10 @@ const getOperatorAndCount = (current, target, operators, loopSize) => {
 
     count = Math.min(mod1, mod2)
 
-    return { operator, count }
+    return operator.repeat(count)
 }
 
-const getMovingCommand = (destinationRegister, targetLetter) => {
+const getTotalMovementCommand = (currentRegister, destinationRegister, targetLetter) => {
     let registerCommand = getMovingRegisterCommand(currentRegister, destinationRegister)
     let letterCommand = getMovingLetterCommand(registers[destinationRegister], targetLetter)
 
@@ -55,26 +53,14 @@ const getMovingCommand = (destinationRegister, targetLetter) => {
 }
 
 const getMovingLetterCommand = (origin, target) => {
-    let command = ''
-
     const currentAlphabetIndex = getAlphabetIndex(origin)
     const targetAlphabetIndex = getAlphabetIndex(target)
 
-    const { operator, count } = getOperatorAndCount(currentAlphabetIndex, targetAlphabetIndex, { increase: '+', decrease: '-'}, ALPHABET_SIZE)
-
-    command += operator.repeat(count)
-
-    return command
+    return getCommand(currentAlphabetIndex, targetAlphabetIndex, { increase: '+', decrease: '-' }, ALPHABET_SIZE)
 }
 
 const getMovingRegisterCommand = (origin, destination) => {
-    let command = ''
-
-    const { operator, count } = getOperatorAndCount(origin, destination, { increase: '>', decrease: '<'}, TOTAL_REGISTERS)
-
-    command += operator.repeat(count)
-
-    return command
+    return getCommand(origin, destination, { increase: '>', decrease: '<' }, TOTAL_REGISTERS)
 }
 
 const getShortestCommandTo = (targetLetter) => {
@@ -82,19 +68,18 @@ const getShortestCommandTo = (targetLetter) => {
     let shortestCommandLength = Infinity
     let selectedRegister = 0
 
-    for (let i = 0; i < TOTAL_REGISTERS; i++) {
-        let command = getMovingCommand(i, targetLetter);
+    for (let r = 0; r < TOTAL_REGISTERS; r++) {
+        let command = getTotalMovementCommand(currentRegister, r, targetLetter);
         
         if (command.length < shortestCommandLength) {
             shortestCommandLength = command.length
-            selectedRegister = i
+            selectedRegister = r
             shortestCommand = command
         }
     }
 
     return { shortestCommand, selectedRegister }
 }
-
 
 magicPhrase.split('').map(targetLetter => {
     let { shortestCommand, selectedRegister } = getShortestCommandTo(targetLetter)
