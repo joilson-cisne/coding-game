@@ -8,17 +8,14 @@
 
 // const magicPhrase = readline();
 const magicPhrase = process.argv[2] || 'MINAS';
-
-// Start your code here
+console.error(magicPhrase)
 
 const ALPHABET_SIZE = 27
 const TOTAL_REGISTERS = 30
-const registers = new Array(TOTAL_REGISTERS).fill(' ')
 
-console.error(magicPhrase)
-
-let result = ''
+let registers = new Array(TOTAL_REGISTERS).fill(' ')
 let currentRegister = 0
+let result = ''
 
 const getAlphabetIndex = (letter) => {
   if (!letter || letter == ' ') {
