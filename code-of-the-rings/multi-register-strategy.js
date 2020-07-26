@@ -50,6 +50,13 @@ const getOperatorAndCount = (currentIndex, targetIndex, operators, loopSize) => 
     return { operator, count }
 }
 
+const getMovingCommand = (destinationRegister, targetLetter) => {
+    let tempRegisterCommand = getMovingRegisterCommand(currentRegister, destinationRegister)
+    let tempLetterCommand = getMovingLetterCommand(registers[destinationRegister], targetLetter)
+
+    return tempRegisterCommand + tempLetterCommand
+}
+
 const getMovingLetterCommand = (origin, target) => {
     let command = ''
 
@@ -73,29 +80,25 @@ const getMovingRegisterCommand = (origin, destination) => {
     return command
 }
 
-magicPhrase.split('').map(target => {
-    let minCommandSize = Infinity
+magicPhrase.split('').map(targetLetter => {
+    let shortestCommandLength = Infinity
     let selectedRegister = 0
-    let minCommand = ''
+    let shortestCommand = ''
 
     for (let i = 0; i < TOTAL_REGISTERS; i++) {
-        let tempLetterCommand = getMovingLetterCommand(registers[i], target)
-        let tempLetterCommandLength = tempLetterCommand.length
-
-        let tempRegisterCommand = getMovingRegisterCommand(currentRegister, i)
-        let tempRegisterCommandLength = tempRegisterCommand.length
+        let tempCommand = getMovingCommand(i, targetLetter);
         
-        if (tempLetterCommandLength + tempRegisterCommandLength < minCommandSize) {
-            minCommandSize = tempLetterCommandLength + tempRegisterCommandLength
+        if (tempCommand.length < shortestCommandLength) {
+            shortestCommandLength = tempCommand.length
             selectedRegister = i
-            minCommand = tempRegisterCommand + tempLetterCommand
+            shortestCommand = tempCommand
         }
     }
 
-    registers[selectedRegister] = target
+    registers[selectedRegister] = targetLetter
     currentRegister = selectedRegister
     
-    result += minCommand + '.'
+    result += shortestCommand + '.'
 })
 
 console.log(result);
