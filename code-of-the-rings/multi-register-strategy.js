@@ -29,11 +29,11 @@ const mod = (a, b) => ((a % b) + b) % b
 
 const incrementRegister = register => mod(register + 1, TOTAL_REGISTERS)
 
-const getOperatorAndCount = (currentIndex, targetIndex, operators, loopSize) => {
+const getOperatorAndCount = (current, target, operators, loopSize) => {
     let operator = ''
     let count = 0
 
-    const diff = targetIndex - currentIndex
+    const diff = target - current
 
     const mod1 = mod(diff, loopSize)
     const mod2 = mod(-diff, loopSize)
